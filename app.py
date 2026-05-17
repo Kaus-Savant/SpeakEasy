@@ -1,5 +1,7 @@
 import streamlit as st
 import random
+import io
+
 from groq import Groq
 
 st.set_page_config(page_title="SpeakEasy - Learn with Mr John", page_icon="🗣️", layout="wide", initial_sidebar_state="expanded")
@@ -17,9 +19,9 @@ st.markdown("""
 
 # ===================== TRANSLATIONS =====================
 T = {
-    "en": {"app":"SpeakEasy","sub":"Learn English with Mr John","class":"Class","chat":"Chat with Mr John","lessons":"Lessons","quizzes":"Quizzes","progress":"My Progress","welcome":"Welcome to SpeakEasy!","greeting":"Hello! I am Mr John. I am your English teacher. What is your name?","type":"Type a message...","send":"Send","start_quiz":"Start Quiz","submit":"Submit Answers","your_score":"Your Score","out_of":"out of","correct":"Correct","incorrect":"Incorrect","streak":"Day Streak","lessons_done":"Lessons Completed","quizzes_taken":"Quizzes Taken","avg_score":"Average Score","complete":"Complete Lesson","next":"Next Lesson","prev":"Previous Lesson","try_again":"Try Again","back":"Back to Home","reset":"Reset Chat","choose":"Choose a topic to learn","practice":"Practice","examples":"Examples","error_lessons":"No lessons available for this class.","error_quiz":"No quiz available.","no_key":"Groq API key not set. Enter your API key in the sidebar.","settings":"Settings","api_key":"Enter your Groq API Key","name":"Your Name","home":"Home","ask":"Ask Mr John about this topic","answered":"answered","lesson_done":"Lesson Completed!","quiz_done":"Quiz Completed!","all_clear":"All Clear!"},
-    "hi": {"app":"स्पीकईज़ी","sub":"मिस्टर जॉन से अंग्रेज़ी सीखें","class":"कक्षा","chat":"मिस्टर जॉन से बात करें","lessons":"पाठ","quizzes":"प्रश्नोत्तरी","progress":"मेरी प्रगति","welcome":"स्पीकईज़ी में आपका स्वागत है!","greeting":"नमस्ते! मैं मिस्टर जॉन हूँ। आपका नाम क्या है?","type":"संदेश लिखें...","send":"भेजें","start_quiz":"प्रश्नोत्तरी शुरू करें","submit":"उत्तर जमा करें","your_score":"आपका स्कोर","out_of":"में से","correct":"सही","incorrect":"गलत","streak":"लगातार दिन","lessons_done":"पूरे किए गए पाठ","quizzes_taken":"दी गई प्रश्नोत्तरी","avg_score":"औसत स्कोर","complete":"पाठ पूरा करें","next":"अगला पाठ","prev":"पिछला पाठ","try_again":"फिर से प्रयास करें","back":"होम पर वापस जाएँ","reset":"चैट रीसेट करें","choose":"विषय चुनें","practice":"अभ्यास","examples":"उदाहरण","error_lessons":"कोई पाठ उपलब्ध नहीं।","error_quiz":"कोई प्रश्नोत्तरी नहीं।","no_key":"API कुंजी सेट नहीं है।","settings":"सेटिंग्स","api_key":"API कुंजी दर्ज करें","name":"आपका नाम","home":"होम","ask":"इस विषय के बारे में पूछें","answered":"उत्तर दिए","lesson_done":"पाठ पूरा हुआ!","quiz_done":"प्रश्नोत्तरी पूरी हुई!","all_clear":"सब सही!"},
-    "ta": {"app":"ஸ்பீக் ஈஸி","sub":"திரு ஜானுடன் ஆங்கிலம் கற்கவும்","class":"வகுப்பு","chat":"திரு ஜானுடன் பேசவும்","lessons":"பாடங்கள்","quizzes":"வினாடி வினாக்கள்","progress":"என் முன்னேற்றம்","welcome":"ஸ்பீக் ஈஸிக்கு வரவேற்கிறோம்!","greeting":"வணக்கம்! நான் திரு ஜான். உங்கள் பெயர் என்ன?","type":"செய்தியைத் தட்டச்சு செய்யவும்...","send":"அனுப்பு","start_quiz":"வினாடி வினாவைத் தொடங்கு","submit":"பதில்களைச் சமர்ப்பிக்கவும்","your_score":"உங்கள் மதிப்பெண்","out_of":"இல்","correct":"சரி","incorrect":"தவறு","streak":"தொடர் நாட்கள்","lessons_done":"முடித்த பாடங்கள்","quizzes_taken":"எடுத்த வினாடி வினாக்கள்","avg_score":"சராசரி மதிப்பெண்","complete":"பாடத்தை முடிக்கவும்","next":"அடுத்த பாடம்","prev":"முந்தைய பாடம்","try_again":"மீண்டும் முயற்சிக்கவும்","back":"முகப்புக்குத் திரும்பு","reset":"அரட்டையை மீட்டமைக்கவும்","choose":"தலைப்பைத் தேர்ந்தெடுக்கவும்","practice":"பயிற்சி","examples":"எடுத்துக்காட்டுகள்","error_lessons":"பாடங்கள் இல்லை.","error_quiz":"வினாடி வினா இல்லை.","no_key":"API விசை அமைக்கப்படவில்லை.","settings":"அமைப்புகள்","api_key":"API விசையை உள்ளிடவும்","name":"உங்கள் பெயர்","home":"முகப்பு","ask":"இந்த தலைப்பைப் பற்றி கேளுங்கள்","answered":"பதிலளித்தார்","lesson_done":"பாடம் முடிந்தது!","quiz_done":"வினாடி வினா முடிந்தது!","all_clear":"அனைத்தும் சரி!"},
+    "en": {"app":"SpeakEasy","sub":"Learn English with Mr John","class":"Class","chat":"Chat with Mr John","lessons":"Lessons","quizzes":"Quizzes","progress":"My Progress","welcome":"Welcome to SpeakEasy!","greeting":"Hello! I am Mr John. I am your English teacher. What is your name?","type":"Type or speak...","send":"Send","start_quiz":"Start Quiz","submit":"Submit Answers","your_score":"Your Score","out_of":"out of","correct":"Correct","incorrect":"Incorrect","streak":"Day Streak","lessons_done":"Lessons Completed","quizzes_taken":"Quizzes Taken","avg_score":"Average Score","complete":"Complete Lesson","next":"Next Lesson","prev":"Previous Lesson","try_again":"Try Again","back":"Back to Home","reset":"Reset Chat","choose":"Choose a topic to learn","practice":"Practice","examples":"Examples","error_lessons":"No lessons available for this class.","error_quiz":"No quiz available.","no_key":"Groq API key not set. Enter your API key in the sidebar.","settings":"Settings","api_key":"Enter your Groq API Key","name":"Your Name","home":"Home","ask":"Ask Mr John about this topic","answered":"answered","lesson_done":"Lesson Completed!","quiz_done":"Quiz Completed!","all_clear":"All Clear!","voice_tip":"Use the 🎤 microphone below to speak","listen":"Listen","speaking":"Mr John is speaking...","mic_error":"Could not start microphone. Please type instead.","processing_voice":"Processing your voice..."},
+    "hi": {"app":"स्पीकईज़ी","sub":"मिस्टर जॉन से अंग्रेज़ी सीखें","class":"कक्षा","chat":"मिस्टर जॉन से बात करें","lessons":"पाठ","quizzes":"प्रश्नोत्तरी","progress":"मेरी प्रगति","welcome":"स्पीकईज़ी में आपका स्वागत है!","greeting":"नमस्ते! मैं मिस्टर जॉन हूँ। आपका नाम क्या है?","type":"बोलें या लिखें...","send":"भेजें","start_quiz":"प्रश्नोत्तरी शुरू करें","submit":"उत्तर जमा करें","your_score":"आपका स्कोर","out_of":"में से","correct":"सही","incorrect":"गलत","streak":"लगातार दिन","lessons_done":"पूरे किए गए पाठ","quizzes_taken":"दी गई प्रश्नोत्तरी","avg_score":"औसत स्कोर","complete":"पाठ पूरा करें","next":"अगला पाठ","prev":"पिछला पाठ","try_again":"फिर से प्रयास करें","back":"होम पर वापस जाएँ","reset":"चैट रीसेट करें","choose":"विषय चुनें","practice":"अभ्यास","examples":"उदाहरण","error_lessons":"कोई पाठ उपलब्ध नहीं।","error_quiz":"कोई प्रश्नोत्तरी नहीं।","no_key":"API कुंजी सेट नहीं है।","settings":"सेटिंग्स","api_key":"API कुंजी दर्ज करें","name":"आपका नाम","home":"होम","ask":"इस विषय के बारे में पूछें","answered":"उत्तर दिए","lesson_done":"पाठ पूरा हुआ!","quiz_done":"प्रश्नोत्तरी पूरी हुई!","all_clear":"सब सही!","voice_tip":"बोलने के लिए 🎤 माइक्रोफ़ोन का उपयोग करें","listen":"सुनें","speaking":"मिस्टर जॉन बोल रहे हैं...","mic_error":"माइक्रोफोन शुरू नहीं हो सका। कृपया टाइप करें।","processing_voice":"आपकी आवाज प्रोसेस हो रही है..."},
+    "ta": {"app":"ஸ்பீக் ஈஸி","sub":"திரு ஜானுடன் ஆங்கிலம் கற்கவும்","class":"வகுப்பு","chat":"திரு ஜானுடன் பேசவும்","lessons":"பாடங்கள்","quizzes":"வினாடி வினாக்கள்","progress":"என் முன்னேற்றம்","welcome":"ஸ்பீக் ஈஸிக்கு வரவேற்கிறோம்!","greeting":"வணக்கம்! நான் திரு ஜான். உங்கள் பெயர் என்ன?","type":"பேசுங்கள் அல்லது தட்டச்சு செய்யுங்கள்...","send":"அனுப்பு","start_quiz":"வினாடி வினாவைத் தொடங்கு","submit":"பதில்களைச் சமர்ப்பிக்கவும்","your_score":"உங்கள் மதிப்பெண்","out_of":"இல்","correct":"சரி","incorrect":"தவறு","streak":"தொடர் நாட்கள்","lessons_done":"முடித்த பாடங்கள்","quizzes_taken":"எடுத்த வினாடி வினாக்கள்","avg_score":"சராசரி மதிப்பெண்","complete":"பாடத்தை முடிக்கவும்","next":"அடுத்த பாடம்","prev":"முந்தைய பாடம்","try_again":"மீண்டும் முயற்சிக்கவும்","back":"முகப்புக்குத் திரும்பு","reset":"அரட்டையை மீட்டமைக்கவும்","choose":"தலைப்பைத் தேர்ந்தெடுக்கவும்","practice":"பயிற்சி","examples":"எடுத்துக்காட்டுகள்","error_lessons":"பாடங்கள் இல்லை.","error_quiz":"வினாடி வினா இல்லை.","no_key":"API விசை அமைக்கப்படவில்லை.","settings":"அமைப்புகள்","api_key":"API விசையை உள்ளிடவும்","name":"உங்கள் பெயர்","home":"முகப்பு","ask":"இந்த தலைப்பைப் பற்றி கேளுங்கள்","answered":"பதிலளித்தார்","lesson_done":"பாடம் முடிந்தது!","quiz_done":"வினாடி வினா முடிந்தது!","all_clear":"அனைத்தும் சரி!","voice_tip":"பேச கீழே உள்ள 🎤 மைக்ரோஃபோனைப் பயன்படுத்தவும்","listen":"கேள்","speaking":"திரு ஜான் பேசுகிறார்...","mic_error":"மைக்ரோஃபோனைத் தொடங்க முடியவில்லை. தயவுசெய்து தட்டச்சு செய்யவும்.","processing_voice":"உங்கள் குரல் செயலாக்கப்படுகிறது..."},
 }
 
 # ===================== CURRICULUM =====================
@@ -194,8 +196,50 @@ def ask_mr_john(api_key, grade, message, history, lang="en"):
         return r.choices[0].message.content.strip()
     except Exception as e: return f"Sorry: {str(e)}"
 
+def transcribe_audio(audio_bytes, api_key):
+    try:
+        client = Groq(api_key=api_key)
+        audio_file = io.BytesIO(audio_bytes)
+        audio_file.name = "audio.wav"
+        r = client.audio.transcriptions.create(model="whisper-large-v3-turbo", file=audio_file)
+        return r.text.strip()
+    except Exception as e:
+        return None
+
+# ===================== TTS JS INJECTION =====================
+def inject_tts_js():
+    st.markdown("""
+<script>
+if (!window.__speakEasyInjected) {
+    window.__speakEasyInjected = true;
+    window.speakText = function(text, lang) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = lang || 'en-IN';
+        u.rate = 0.9;
+        u.pitch = 1.05;
+        const voices = window.speechSynthesis.getVoices();
+        const indianVoice = voices.find(v => v.lang.startsWith('en-IN'));
+        if (indianVoice) u.voice = indianVoice;
+        window.speechSynthesis.speak(u);
+    };
+}
+</script>
+""", unsafe_allow_html=True)
+
+
+def speak_btn(text):
+    t = text.replace("`", "\\`").replace("'", "\\'").replace("\n", " ")
+    st.markdown(f'''
+<button onclick="speakText('{t}','en-IN')"
+    style="background:none;border:1px solid #d1d5db;border-radius:999px;padding:2px 12px;font-size:0.8rem;cursor:pointer;color:#4b5563;transition:all 0.2s"
+    onmouseover="this.style.background='#eff6ff';this.style.borderColor='#2563eb';this.style.color='#2563eb'"
+    onmouseout="this.style.background='';this.style.borderColor='#d1d5db';this.style.color='#4b5563'">🔊 Listen</button>
+''', unsafe_allow_html=True)
+
 # ===================== SESSION STATE =====================
-for k in ["name","grade","lang","key","page","chat","done","scores","q_qs","q_as","q_done","l_idx","l_show"]:
+for k in ["name","grade","lang","key","page","chat","done","scores","q_qs","q_as","q_done","l_idx","l_show","voice_input"]:
     if k not in st.session_state:
         if k=="name": st.session_state.name=""
         elif k=="grade": st.session_state.grade=1
@@ -210,9 +254,13 @@ for k in ["name","grade","lang","key","page","chat","done","scores","q_qs","q_as
         elif k=="q_done": st.session_state.q_done=False
         elif k=="l_idx": st.session_state.l_idx=0
         elif k=="l_show": st.session_state.l_show=False
+        elif k=="voice_input": st.session_state.voice_input=""
 
 L = st.session_state.lang
 def _(k): return T[L].get(k,T["en"].get(k,k))
+
+# ===================== VOICE JS (injected once) =====================
+inject_tts_js()
 
 # ===================== SIDEBAR =====================
 with st.sidebar:
@@ -235,9 +283,8 @@ with st.sidebar:
     if ln != L: st.session_state.lang=ln; st.rerun()
     st.markdown("---")
     st.markdown(f"🔥 {_('streak')}: {len(st.session_state.done)}")
+    st.caption(f"💡 {_('voice_tip')}")
     if st.button("🔄 Reset All",use_container_width=True):
-        for k in st.session_state: st.session_state[k]="" if k in["name","key"] else([]if"chat"==k else(set()if"done"==k else({}if"as"in k else(False if"done"in k else(0 if"idx"in k else([]if"qs"in k else[]))))))
-        # simpler: just clear what matters
         st.session_state.chat=[]
         st.session_state.done=set()
         st.session_state.scores=[]
@@ -270,17 +317,27 @@ if "Home" in pg:
         if st.button(f"📚 {_('lessons')}",use_container_width=True): st.session_state.page="📚 Lessons"; st.rerun()
         if st.button(f"📊 {_('progress')}",use_container_width=True): st.session_state.page="📊 Progress"; st.rerun()
     if st.session_state.name:
-        st.info(f"👋 Hello **{st.session_state.name}**! You are in **Class {st.session_state.grade}**.")
+        st.info(f"👋 Hello **{st.session_state.name}**! You are in **Class {st.session_state.grade}**. {_('voice_tip')}")
 
 # ----- CHAT -----
 elif "Chat" in pg:
     st.markdown(f"## 💬 {_('chat')}")
     if not st.session_state.key: st.warning(f"⚠️ {_('no_key')}"); st.stop()
+
     for m in st.session_state.chat:
-        if m["role"]=="user": st.markdown(f'<div class="chat-msg chat-user">{m["content"]}</div>',unsafe_allow_html=True)
-        else: st.markdown(f'<div class="chat-msg chat-teacher"><b>👨‍🏫 Mr John:</b> {m["content"]}</div>',unsafe_allow_html=True)
+        if m["role"]=="user":
+            st.markdown(f'<div class="chat-msg chat-user">{m["content"]}</div>',unsafe_allow_html=True)
+        else:
+            col_msg, col_btn = st.columns([6,1])
+            with col_msg:
+                st.markdown(f'<div class="chat-msg chat-teacher"><b>👨‍🏫 Mr John:</b> {m["content"]}</div>',unsafe_allow_html=True)
+            with col_btn:
+                if m["content"] != _("greeting"):
+                    speak_btn(m["content"])
     if not st.session_state.chat:
         st.markdown(f'<div class="chat-msg chat-teacher"><b>👨‍🏫 Mr John:</b> {_("greeting")}</div>',unsafe_allow_html=True)
+        speak_btn(_("greeting"))
+
     with st.form("cf",clear_on_submit=True):
         u = st.text_input("",placeholder=_("type"),label_visibility="collapsed")
         if st.form_submit_button(_("send")) and u.strip():
@@ -288,7 +345,25 @@ elif "Chat" in pg:
             with st.spinner("👨‍🏫 Mr John is thinking..."):
                 r = ask_mr_john(st.session_state.key,st.session_state.grade,u.strip(),st.session_state.chat[:-1],L)
             st.session_state.chat.append({"role":"assistant","content":r})
+            st.session_state.voice_input = ""
             st.rerun()
+
+    # Voice recording via st.audio_input
+    st.markdown("---")
+    audio_val = st.audio_input("🎤 Record your voice message")
+    if audio_val is not None:
+        with st.spinner(_("processing_voice")):
+            audio_bytes = audio_val.getvalue()
+            text = transcribe_audio(audio_bytes, st.session_state.key)
+        if text:
+            st.session_state.chat.append({"role":"user","content":f"🎤 {text}"})
+            with st.spinner("👨‍🏫 Mr John is thinking..."):
+                r = ask_mr_john(st.session_state.key,st.session_state.grade,text,st.session_state.chat[:-1],L)
+            st.session_state.chat.append({"role":"assistant","content":r})
+            st.rerun()
+        else:
+            st.error(_("mic_error"))
+
     if st.session_state.chat:
         if st.button(f"🗑️ {_('reset')}"): st.session_state.chat=[]; st.rerun()
 
@@ -330,6 +405,7 @@ elif "Lessons" in pg:
                         with st.spinner("..."):
                             a = ask_mr_john(st.session_state.key,st.session_state.grade,f"Explain '{l['topic']}'. Student: {q}",[],L)
                         st.markdown(f'<div class="chat-msg chat-teacher"><b>👨‍🏫 Mr John:</b> {a}</div>',unsafe_allow_html=True)
+                        speak_btn(a)
 
 # ----- QUIZZES -----
 elif "Quizzes" in pg:
