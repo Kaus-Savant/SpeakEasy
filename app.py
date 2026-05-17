@@ -201,7 +201,7 @@ for k in ["name","grade","lang","key","page","chat","done","scores","q_qs","q_as
         elif k=="grade": st.session_state.grade=1
         elif k=="lang": st.session_state.lang="en"
         elif k=="key": st.session_state.key=""
-        elif k=="page": st.session_state.page="Home"
+        elif k=="page": st.session_state.page="🏠 Home"
         elif k=="chat": st.session_state.chat=[]
         elif k=="done": st.session_state.done=set()
         elif k=="scores": st.session_state.scores=[]
